@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>没用的获取地址｜水喝千束的博客</title>
+    <script src="https://api.map.baidu.com/api?v=3.0&ak=Red152FTyGJIgiVmNGeB"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .back-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 5px 10px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .location-info {
+            margin-top: 40px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <button class="back-btn" onclick="goBack()">返回</button>
+    <div class="location-info">正在获取您的位置...</div>
+
+    <script>
+        // 返回按钮跳转的URL（请修改为您要跳转的目标网页）
+        const RETURN_URL = "https://waterchisato.github.io/Apkhome";  // 请替换为您要返回的网页地址
+        
+        // 获取位置信息
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    showPosition,
+                    showError,
+                    {enableHighAccuracy: true, timeout: 5000, maximumAge: 0}
+                );
+            } else {
+                document.querySelector('.location-info').textContent = "您的设备不支持地理位置获取";
+            }
+        }
+
+        // 显示位置信息
+        function showPosition(position) {
+            const point = new BMap.Point(position.coords.longitude, position.coords.latitude);
+            const gc = new BMap.Geocoder();
+            
+            gc.getLocation(point, function(rs) {
+                const addComp = rs.addressComponents;
+                const locationText = `您的位置: ${addComp.province} ${addComp.city}`;
+                document.querySelector('.location-info').textContent = locationText;
+            });
+        }
+
+        // 错误处理
+        function showError(error) {
+            let errorMessage = "获取位置失败: ";
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    errorMessage += "没钱开api，只能作为空壳，没有实质性用途（其实就是我不能实名，而且我也没钱），如果有人开过api，请联系waterchisato@qq.com,谢谢";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    errorMessage += "位置信息不可用";
+                    break;
+                case error.TIMEOUT:
+                    errorMessage += "获取位置超时";
+                    break;
+                case error.UNKNOWN_ERROR:
+                    errorMessage += "未知错误";
+                    break;
+            }
+            document.querySelector('.location-info').textContent = errorMessage;
+        }
+
+        // 返回按钮功能
+        function goBack() {
+            window.location.href = RETURN_URL;
+        }
+
+        // 页面加载时获取位置
+        window.onload = getLocation;
+    </script>
+</body>
+</html>
